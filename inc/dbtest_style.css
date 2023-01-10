@@ -1,0 +1,149 @@
+@charset "utf-8";
+header {
+	margin:20px 0px 0px 30px;
+	height:77px;
+}
+h1 {
+	font-family:Arial, Helvetica, sans-serif;
+}
+#nav {
+    overflow:  auto;
+}
+#nav li {
+  list-style: none;
+  width: 100px;
+  background-color: #EEFFFF;
+  float: left;
+}
+
+
+h1{
+  text-align: center;
+}
+#nav{
+  display: flex;
+  justify-content: center;
+}
+#nav > li {
+  text-align: center;
+}
+.header-nav{
+  max-width: 50%;
+  margin: auto;
+}
+
+
+form {
+  /* フォームをページの中央に置く */
+  margin: 0 auto;
+  /* フォームの範囲がわかるようにする */
+  padding: 1em;
+  border: 1px solid #CCC;
+  border-radius: 1em;
+  width:550px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin-left:30px;
+  margin-right:0;
+  margin-bottom:20px;
+  margin-top:5px;
+}
+
+form li + li {
+  margin-top: 1em;
+}
+ 
+label {
+  /* すべてのラベルを同じサイズにして、きちんと揃える */
+  display: inline-block;
+  width: 260px;
+  text-align: right;
+}
+
+
+input, textarea {
+  /* すべてのテキストフィールドのフォント設定を一致させる
+     デフォルトで、textarea は等幅フォントが設定されている */
+  font: 1em sans-serif;
+
+  /* すべてのテキストフィールドを同じサイズにする */
+  width: 260px;
+  box-sizing: border-box;
+
+  /* テキストフィールドのボーダーの外見を同一にする */
+  border: 1px solid #999;
+}
+
+input:focus,
+textarea:focus {
+  /* アクティブな要素を少し強調する */
+  border-color: #000;
+}
+
+textarea {
+  /* 複数行のテキストフィールドをラベルにきちんと揃える */
+  vertical-align: top;
+
+  /* テキスト入力に十分な領域を与える */
+  height: 5em;
+}
+
+.button {
+  /* ボタンを他のテキストフィールドと同じ場所に置く */
+  margin-left: 265px; /* label 要素と同じサイズ */
+}
+
+button {
+  /* このマージンは、ラベルとテキストフィールドの間のスペースと
+     おおよそ同じスペースを表す */
+  margin-left: .5em;
+}
+
+/* 更新フォームサイズ調整 */
+
+form.editform {
+  width:400px;
+}
+
+form.editform label {
+  width: 90px;
+}
+
+form.editform .button {
+  margin-left: 95px;
+}
+
+/* ログインフォームサイズ調整 */
+
+form.loginform {
+  width:400px;
+}
+
+form.loginform label {
+  width: 90px;
+}
+
+form.loginform input[type='submit'] {
+  margin-left: 95px;
+}
+
+
+table {
+  border: solid 1px;
+  margin-left:30px;
+  border-collapse:  collapse;
+}
+
+td,th {
+  padding: 0.3em;
+  border: solid 1px;
+}
+
+
+
+table{
+  margin: auto;
+}
