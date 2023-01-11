@@ -14,6 +14,6 @@ try {
 }
 ?>
   
-<?php $books->showBooksList(); ?>
+<?php $books->showList(); ?>
     
 <?php include __DIR__ .'/../inc/footer.php';?>

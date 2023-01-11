@@ -107,7 +107,7 @@ class Books{
     }
 
     /** テーブル booksの内容を<table>で出力する */
-    public function showBooksList() :void {
+    public function showList() :void {
         $sql = 'SELECT * FROM books';
         // ↓sql文を実行
         // 表構造のデータが戻ってくる。配列ではない
@@ -141,7 +141,7 @@ class Books{
     }
 
    /** データベースにユーザー入力データを追加する */
-   public function addBooks() :void {
+   public function add() :void {
         $sql = 'INSERT INTO books(id, title, isbn, price, publish, author) 
                 VALUES (NULL, ?, ?, ?, ?, ?)';
         $stmt = $this->dbh->prepare($sql);
@@ -157,7 +157,7 @@ class Books{
 }
 
     /** booksテーブルを更新する */
-    public function updateBooks(){
+    public function update(){
         $sql = "UPDATE books SET
         title = ?,
         isbn = ?,
