@@ -10,7 +10,7 @@ class DB{
 
     /**データベースの情報。本来は別ファイルに分けたりしたい。*/
     private const HOST ='mysql1.php.xdomain.ne.jp';
-    private const DB_NAME = 'sampledb';
+    private const DB_NAME = 'akisyokuren_sampledb';
     private const DB = "mysql:host=" .self::HOST .";dbname=" .self::DB_NAME;
     private const USER = 'akisyokuren_toga';
     private const PASSWORD = 'yesterday';
