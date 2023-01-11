@@ -16,6 +16,6 @@
         <ul id='nav'>
             <li><a href="./">ホーム</li></a>
             <li><a href="./input-form.php">追加</li></a>
-            <li><a href="./logout.php"><?= empty($_SESSION['login']) ? 'ログイン':'ログアウト'?></li></a>
+            <li><a href="<?= empty($_SESSION['login']) ? './login.php">ログイン':'./logout.php">ログアウト'?></li></a>
         </ul>
     </div>

@@ -1,8 +1,12 @@
 <?php
+/**
+ * ユーザー入力のバリデーションチェック、データチェックを行い、
+ * xss対策の関数を含むクラス
+ */
 class UserInput{
-    // エラーメッセージ
+    /** エラーメッセージ */
 
-    // booksテーブルに関するエラーメッセージ
+   /** booksテーブルに関するエラーメッセージ */
     private const ID_ERROR = [
         'NoId' => 'idを指定してください。',
         'IncorrectId' => 'idが正しくありません。',
@@ -22,7 +26,9 @@ class UserInput{
 
     private const AUTHOR_ERROR = '著者名は80文字以内で入力してください。';
 
-    // ログイン入力についてのエラーメッセージ
+    private const BOOKDATA_ERROR = '指定したデータはありません';
+
+    /** ログイン入力についてのエラーメッセージ */
     private const USERNAME_ERROR =[
         'NoUsername' => 'ユーザー名を入力してください。',
         'NotExistUsername' => 'ログインに失敗しました。'
@@ -32,27 +38,33 @@ class UserInput{
         'WrongPassword' => 'ログインに失敗しました。',
     ];
 
-    // XSS対策
+    /** XSS対策 */
     static function e($str){
         htmlspecialchars($str, ENT_QUOTES|ENT_HTML5, 'UTF-8');
         return $str;
     }
 
-    // 入力内容($data)をバリデーションでチェックする。
-
-    // booksのidのバリデーション
-    static function checkId(string $id): Generator{
-        if ($id){
-            // idのバリデーション
-            if (empty($id)){
-                yield self::ID_ERROR['NoId'];
-            } else if (!preg_match('/\A\d{1,11}+\z/u', $id)) {
-                yield self::ID_ERROR['IncorrectId'];
-            }
+    /** 入力内容($data)をバリデーションでチェックする */
+    /** 
+     * booksのidのバリデーション 
+     * 
+     * @param string $_POST['id']を受け取る
+     * @return  エラーがあればエラーメッセージ文字列を返す
+    */
+    static function checkId(string $id) {
+        if (empty($id)){
+            return self::ID_ERROR['NoId'];
+        } else if (!preg_match('/\A\d{1,11}+\z/u', $id)) {
+            return self::ID_ERROR['IncorrectId'];
         }
     }
 
-    // booksの各情報のバリデーション
+    /** 
+     * booksの各情報のバリデーション 
+     * 
+     * @param array $_POSTや$_GETを受け取る
+     * @return array エラーがあれば配列で返す
+    */
     public static function checkBookData(array $data): array {
         $error = [];
         // 作品名のバリデーション
@@ -90,22 +102,26 @@ class UserInput{
         return $error;
     }
 
-    // static function checkAddOrUpdate(array $data) {
-    //     $add = false;
-    //     if (!empty($data['id'])){
-    //         echo "エラーが発生しました.";
-    //         return ;
-    //     }
-    //     $BookDataError = self::checkBookData($data);
-    //     foreach ($BookDataError as $e){
-    //         $error[] = $e;
-    //     }
-    //     return $error;
-    // }
 
+    /**
+     * 指定idの行が存在するか調べる
+     *
+     * @param [type] BooksクラスのgetBookDataById()の戻り値
+     * @return string エラーがあれば文字列で返す
+     */ 
+    static function isBookData($bookData){
+        if (empty($bookData)){
+            return self::BOOKDATA_ERROR;
+        }
+    }
     
-    // ログイン入力のバリデーション
-    // 最初に行う簡易チェック
+    /** ログイン入力のバリデーション */
+    /**
+     * 最初に行う簡易チェック
+     * 
+     * @param array $inputData $_POSTを受け取る
+     * @return array エラーメッセージを配列で返す。エラーがなければ空の配列
+     */ 
     static function checkSimple(array $inputData): array {
         $error = [];
         if (empty($inputData['username'])){
@@ -117,14 +133,25 @@ class UserInput{
         return $error;
     }
 
-    // 入力されたpasswordとDBのパスワードを比較する。
+    /**
+     * 入力されたpasswordとDBのパスワードを比較する。
+     *
+     * @param [type] $inputPass Usersクラスの$password(ユーザー入力パスワード)
+     * @param [type] $savedPass DB上のパスワード
+     * @return void
+     */ 
     static function checkPassword($inputPass, $savedPass){
         if(!password_verify($inputPass, $savedPass)) { 
             return self::PASSWORD_ERROR['WrongPassword'];
         }
     }
 
-    // ユーザー名が存在するかのチェック
+    /**
+     * ユーザー名が存在するかのチェック
+     *
+     * @param [type] $stmtResult Usersクラスの$usernameを使い、DBから取得したパスワード
+     * @return boolean usernameがあればtrue
+     */ 
     static function isUserName($stmtResult): bool {
         // $resultが空ならusernameが存在しない
         if (!$stmtResult){

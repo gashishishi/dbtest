@@ -42,9 +42,10 @@ class User{
         }
     }
 
-    /**ユーザー入力からユーザー名を設定する。
+    /**
+     * ユーザー入力からユーザー名を設定する。
      * 入力されたユーザー名にxxs対策を行う
-     * @param array ユーザー入力($_POST)
+     * @param array $userInput ユーザー入力($_POST)
     */
     public function setUsername(array $userInput){
         $usernameError = UserInput::isUsername($userInput);
