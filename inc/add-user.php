@@ -18,44 +18,60 @@ if (!empty($_SESSION['login'])){
     }
 }
 ?>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <form action="add-user.php">
-        追加するユーザー
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+<form action='add-user.php' method='post'>
     <p>
-        <label for="username">ユーザー名:</label>
-        <input type="text" name="username">
+        <label for=''>ユーザー名:</label>
+        <input type='text' id="username" name='username'>
     </p>
     <p>
-        <label for="password">パスワード:</label>
-        <input type="password" name="password">
+        <label for=''>パスワード:</label>
+        <input type='text' name='password'>
     </p>
-    <input type="submit" value="送信する">
-    </form>
-    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
-	<script>
+
+    <p class='button'>
+      <input type='hidden' name='token' value='<?php echo $token ?>'>
+      <input type='submit' value=' 送信する'>
+    </p>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+
+<script>
 		$(function() {
-			$("#button1").change(function() {
+			$("#username").change(function() {
 				$.ajax({
-						url: "testform.php",        // 送り先のURL
-						type: "POST",
-						data: $("#username").val(), // 送る値
-						dataType: "html",           // 受け取るデータの型
-						timeout: 2000,              //応答時間のタイムアウト
+						url: "select-user.php",         //行き先のURL
+						type: "POST",                //HTTP送信メソッド
+						data: $("#username").val(),  // 送る値
+						dataType: "html",            // 受け取るデータの型
+						timeout: 2000,              // 応答時間のタイムアウト
 					})
 					.done(function( res ) {
-						console.log( res ); // 成功した場合、phpから受け取った値がコンソールに出る。確認用
+							console.log(res ); // 成功した場合,phpから受け取った値がコンソールにでる
+                            $('#username').after(res);
 					})
-
-                    //通信失敗の場合。何が原因かわかりやすいので出す。
 					.fail(function(jqXHR, textStatus, errorThrown) {
-						console.log(jqXHR.status); //例：404
+						console.log(jqXHR.status); // 失敗した場合 例：404
 						console.log(textStatus); //例：error
 						console.log(errorThrown); //例：NOT FOUND
 					})
 					// .always(function() {
 					// 	console.log("complete"); // complete
-					// });この辺全部いらない
+					// });
 			});
 		});
 	</script>
-<?php include __DIR__ .'/../inc/footer.php';?>
+<?php include __DIR__ . '/../inc/footer.php'; ?>
