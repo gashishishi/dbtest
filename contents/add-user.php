@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once
 require_once __DIR__ .'/../inc/user.php';
 include __DIR__ .'/../inc/header.php';
 
