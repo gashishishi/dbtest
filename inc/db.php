@@ -9,10 +9,10 @@ class DB{
     private $dbh;
 
     /**データベースの情報。本来は別ファイルに分けたりしたい。*/
-    private const HOST ='localhost';
-    private const DB_NAME = 'sample_db';
+    private const HOST ='mysql1.php.xdomain.ne.jp';
+    private const DB_NAME = 'sampledb';
     private const DB = "mysql:host=" .self::HOST .";dbname=" .self::DB_NAME;
-    private const USER = 'root';
+    private const USER = 'akisyokuren_toga';
     private const PASSWORD = 'yesterday';
     private const OPT = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
