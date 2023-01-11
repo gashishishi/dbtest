@@ -122,15 +122,16 @@ class UserInput{
      * @param array $inputData $_POSTを受け取る
      * @return array エラーメッセージを配列で返す。エラーがなければ空の配列
      */ 
-    static function checkSimple(array $inputData): array {
-        $error = [];
-        if (empty($inputData['username'])){
-            $error[] = self::USERNAME_ERROR['NoUsername'];
+    static function checkNameSimple(string $inputName): string {
+        if (empty($inputName)){
+            return self::USERNAME_ERROR['NoUsername'];
         }
-        if (empty($inputData['password'])){
-            $error[] = self::PASSWORD_ERROR['NoPassword'];
+        
+    }
+    static function checkPasswordSimple(string $inputPassword): string {
+        if (empty($inputPassword)){
+            return self::PASSWORD_ERROR['NoPassword'];
         }
-        return $error;
     }
 
     /**
