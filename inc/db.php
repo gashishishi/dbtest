@@ -9,23 +9,21 @@ class DB{
     private $dbh;
 
     /**データベースの情報。本来は別ファイルに分けたりしたい。*/
+
+    // アップロード
     // private const HOST ='mysql1.php.xdomain.ne.jp';
     // private const DB_NAME = 'akisyokuren_sampledb';
     // private const DB = "mysql:host=" .self::HOST .";dbname=" .self::DB_NAME;
     // private const USER = 'akisyokuren_toga';
     // private const PASSWORD = 'yesterday';
-    // private const OPT = [
-    //     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    //     // MySQLからのエラーを取得する
-    //     PDO::ATTR_EMULATE_PREPARES => false,
-    //     // マルチクエリを不可に。セキュリティ的な目的。
-    //     PDO::MYSQL_ATTR_MULTI_STATEMENTS => false,
-    // ];
+    // ローカル
     private const HOST ='localhost';
     private const DB_NAME = 'sample_db';
     private const DB = "mysql:host=" .self::HOST .";dbname=" .self::DB_NAME;
     private const USER = 'root';
     private const PASSWORD = 'yesterday';
+
+    //ローカル・アップロード共用
     private const OPT = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         // MySQLからのエラーを取得する
