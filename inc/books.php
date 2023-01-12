@@ -116,7 +116,27 @@ class Books{
         // booksテーブルの内容をリスト形式で表示する。
         echo "<table>";
         echo "<tr><th>更新</th><th>書籍名</th><th>ISBN</th><th>価格</th><th>出版日</th><th>著者名</th></tr>";
-        
+        foreach($statement as $row){
+            $id = UserInput::e($row[0]);
+            $title = UserInput::e($row[1]);
+            $isbn = UserInput::e($row[2]);
+            $price = UserInput::e($row[3]);
+            $publish = UserInput::e($row[4]);
+            $author = UserInput::e($row[5]);
+// ヒアドキュメント
+$booksList = <<<EOD
+<tr>
+<td><a href="input-form.php?id={$id}">更新</a></td>
+<td>$title</td>
+<td>$isbn</td>
+<td>$price</td>
+<td>$publish</td>
+<td>$author</td>
+</tr>
+EOD;
+            
+            echo $booksList;
+        }
         echo "</table>";
     }
 
