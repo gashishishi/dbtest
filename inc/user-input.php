@@ -120,15 +120,15 @@ class UserInput{
      * 最初に行う簡易チェック
      * 
      * @param array $inputData $_POSTを受け取る
-     * @return array エラーメッセージを配列で返す。エラーがなければ空の配列
+     * @return エラーメッセージを配列で返す。エラーがなければ返さない
      */ 
-    static function checkNameSimple(string $inputName): string {
+    static function checkNameSimple(string $inputName) {
         if (empty($inputName)){
             return self::USERNAME_ERROR['NoUsername'];
         }
         
     }
-    static function checkPasswordSimple(string $inputPassword): string {
+    static function checkPasswordSimple(string $inputPassword) {
         if (empty($inputPassword)){
             return self::PASSWORD_ERROR['NoPassword'];
         }
