@@ -13,40 +13,37 @@ class User{
     private $username;
     private $password;
 
-    public function __construct(array $userInput = null){
+    public function __construct(array $userInput, bool $check = false){
         // データベース接続
         $this->dbh = DB::getDbInstance()->getDbh();
-        if($userInput){
 
         // ユーザー名とパスワードの未入力チェック。
-        $usernameError = UserInput::checkNameSimple($userInput['username']);
-        if (!empty($userInput['password'])){
-            $passwordError = UserInput::checkNameSimple($userInput['username']);
+        $nameError = UserInput::checkNameSimple($userInput['username']);
+        $passwordError = UserInput::checkPasswordSimple($userInput['password']);
+        if($nameError){
+            echo $nameError;
+            return;
         }
-        
-        if(!$usernameError && !$passwordError){
-            // ユーザー名の設定
-            $this->setUsername($userInput);
-        } else {
-            echo $usernameError.'<br>';
-            echo $passwordError.'<br>';
+        if($passwordError){
+            echo $passwordError;
             return;
         }
 
-        if(!empty($userInput['password'])){
-            // ユーザー名が設定できたら、DBからハッシュ化されたパスワードを取得し設定する。
-            $this->setPassword();
-            
-            // パスワードのチェック
-            $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
-            if ($checkPasswordError){
-                echo $checkPasswordError;
-                return;
-            } else {
-                $this->createSessionId($userInput['password']);
-            }
+        // エラーがなければ設定する
+        // ユーザー名の設定
+        $this->setUsername($userInput);
+
+        // ユーザー名が設定できたら、DBからハッシュ化されたパスワードを取得し設定する。
+        $this->setPassword();
+        
+        // パスワードのチェック
+        $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
+        if ($checkPasswordError){
+            echo $checkPasswordError;
+            return;
+        } else {
+            $this->createSessionId($userInput['password']);
         }
-    }
 
     }
 

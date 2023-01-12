@@ -2,21 +2,19 @@
 session_start();
 require_once __DIR__ .'/../inc/user.php';
 include __DIR__ .'/../inc/header.php';
-
 if (!empty($_SESSION['login'])){
     if ($_SESSION['login'] === true) {
         echo "ログイン済みです<br>";
         echo "<a href='index.php'>リストに戻る</a>";
     }
-} else if (empty($_POST['username']) || empty($_POST['password'])){
-        echo "ユーザー名、パスワードを入力してください。";
-} else {
+} else{
     try{
         $user = new User($_POST);
     } catch (PDOException $e){
         echo "エラー!" .$user->e($e->getMessage());
     }
 }
+
 ?>
 
     <form method="post" action="login.php">
