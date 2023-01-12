@@ -10,18 +10,18 @@ class DB{
 
     /**データベースの情報。本来は別ファイルに分けたりしたい。*/
 
-    // アップロード
-    private const HOST ='mysql1.php.xdomain.ne.jp';
-    private const DB_NAME = 'akisyokuren_sampledb';
-    private const DB = "mysql:host=" .self::HOST .";dbname=" .self::DB_NAME;
-    private const USER = 'akisyokuren_toga';
-    private const PASSWORD = 'yesterday';
-    // ローカル
-    // private const HOST ='localhost';
-    // private const DB_NAME = 'sample_db';
+    // // アップロード
+    // private const HOST ='mysql1.php.xdomain.ne.jp';
+    // private const DB_NAME = 'akisyokuren_sampledb';
     // private const DB = "mysql:host=" .self::HOST .";dbname=" .self::DB_NAME;
-    // private const USER = 'root';
+    // private const USER = 'akisyokuren_toga';
     // private const PASSWORD = 'yesterday';
+    // ローカル
+    private const HOST ='localhost';
+    private const DB_NAME = 'sample_db';
+    private const DB = "mysql:host=" .self::HOST .";dbname=" .self::DB_NAME;
+    private const USER = 'root';
+    private const PASSWORD = 'yesterday';
 
     //ローカル・アップロード共用
     private const OPT = [
