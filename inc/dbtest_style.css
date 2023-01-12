@@ -16,23 +16,6 @@ h1 {
   float: left;
 }
 
-
-h1{
-  text-align: center;
-}
-#nav{
-  display: flex;
-  justify-content: center;
-}
-#nav > li {
-  text-align: center;
-}
-.header-nav{
-  max-width: 50%;
-  margin: auto;
-}
-
-
 form {
   /* フォームをページの中央に置く */
   margin: 0 auto;
@@ -142,8 +125,3 @@ td,th {
   border: solid 1px;
 }
 
-
-
-table{
-  margin: auto;
-}
