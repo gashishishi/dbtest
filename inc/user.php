@@ -13,12 +13,12 @@ class User{
     private $username;
     private $password;
 
-    public function __construct(array $userInput, bool $check = false){
+    public function __construct(array $userInput = null, bool $check = false){
         // データベース接続
-        if(!empty($userInput)){
+        $this->dbh = DB::getDbInstance()->getDbh();
 
-            $this->dbh = DB::getDbInstance()->getDbh();
-
+        // jQueryなどで既存usernameのチェックを行う場合はデータベース接続のみ。
+        if(!$check){
             // ユーザー名とパスワードの未入力チェック。
             $nameError = UserInput::checkNameSimple($userInput['username']);
             $passwordError = UserInput::checkPasswordSimple($userInput['password']);
@@ -89,6 +89,10 @@ class User{
         $stmt->bindParam(1, $username, PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        //bool値 で返すべき?
+        // isusername関数はuserinputにもあるからうまいこと統合したい
+
         return $result;
     }
 
