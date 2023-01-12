@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once __DIR__ .'/login-check.php';
 require_once __DIR__ .'/../inc/books.php';
 require_once __DIR__ .'/../inc/user.php';
@@ -20,8 +19,8 @@ if (!empty($_GET['id'])){
     
     // inputタグのvalueに設定する用
     // 本の情報の設定と取得
-    $books->setBookData($_GET);
-    $booksProperty = $books->getBooksProperty();
+    $books->setProperty($_GET);
+    $booksProperty = $books->getProperty();
 }
 
 ?>

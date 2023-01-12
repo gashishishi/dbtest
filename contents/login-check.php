@@ -4,5 +4,6 @@ if(!isset($_SESSION)){
 }
 if(empty($_SESSION['login'])){
     echo 'このページにアクセスするには、<a href="login.php">ログイン</a>が必要です。';
-} else {
+    exit;
 }
+echo '<!--ログイン中です-->';
