@@ -15,34 +15,37 @@ class User{
 
     public function __construct(array $userInput, bool $check = false){
         // データベース接続
-        $this->dbh = DB::getDbInstance()->getDbh();
+        if(!empty($userInput)){
 
-        // ユーザー名とパスワードの未入力チェック。
-        $nameError = UserInput::checkNameSimple($userInput['username']);
-        $passwordError = UserInput::checkPasswordSimple($userInput['password']);
-        if($nameError){
-            echo $nameError;
-            return;
-        }
-        if($passwordError){
-            echo $passwordError;
-            return;
-        }
+            $this->dbh = DB::getDbInstance()->getDbh();
 
-        // エラーがなければ設定する
-        // ユーザー名の設定
-        $this->setUsername($userInput);
+            // ユーザー名とパスワードの未入力チェック。
+            $nameError = UserInput::checkNameSimple($userInput['username']);
+            $passwordError = UserInput::checkPasswordSimple($userInput['password']);
+            if($nameError){
+                echo $nameError.'<br>';
+                return;
+            }
+            if($passwordError){
+                echo $passwordError.'<br>';
+                return;
+            }
 
-        // ユーザー名が設定できたら、DBからハッシュ化されたパスワードを取得し設定する。
-        $this->setPassword();
-        
-        // パスワードのチェック
-        $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
-        if ($checkPasswordError){
-            echo $checkPasswordError;
-            return;
-        } else {
-            $this->createSessionId($userInput['password']);
+            // エラーがなければ設定する
+            // ユーザー名の設定
+            $this->setUsername($userInput);
+
+            // ユーザー名が設定できたら、DBからハッシュ化されたパスワードを取得し設定する。
+            $this->setPassword();
+            
+            // パスワードのチェック
+            $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
+            if ($checkPasswordError){
+                echo $checkPasswordError;
+                return;
+            } else {
+                $this->createSessionId($userInput['password']);
+            }
         }
 
     }
@@ -55,7 +58,7 @@ class User{
     public function setUsername(array $userInput){
         $usernameError = UserInput::isUsername($userInput);
         if ($usernameError){
-            echo $usernameError;
+            echo "debug ここはsetUsername()";
         } else{
             $this->username = UserInput::e($userInput['username']);
         }

@@ -120,7 +120,7 @@ class UserInput{
      * 最初に行う簡易チェック
      * 
      * @param array $inputData $_POSTを受け取る
-     * @return エラーメッセージを配列で返す。エラーがなければ返さない
+     * @return エラーメッセージを文字列で返す。エラーがなければ返さない
      */ 
     static function checkNameSimple(string $inputName) {
         if (empty($inputName)){
@@ -128,6 +128,12 @@ class UserInput{
         }
         
     }
+    /**
+     * 最初に行う簡易チェック
+     * 
+     * @param array $inputData $_POSTを受け取る
+     * @return エラーを文字列で返す。エラーがなければ返さない
+     */ 
     static function checkPasswordSimple(string $inputPassword) {
         if (empty($inputPassword)){
             return self::PASSWORD_ERROR['NoPassword'];
@@ -151,7 +157,7 @@ class UserInput{
      * ユーザー名が存在するかのチェック
      *
      * @param [type] $stmtResult Usersクラスの$usernameを使い、DBから取得したパスワード
-     * @return boolean usernameがあればtrue
+     * @return boolean 
      */ 
     static function isUserName($stmtResult): bool {
         // $resultが空ならusernameが存在しない
