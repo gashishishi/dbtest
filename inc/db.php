@@ -23,7 +23,7 @@ class DB{
     private const USER = 'root';
     private const PASSWORD = 'yesterday';
 
-    //ローカル・アップロード共用
+    //ローカル・アップロード共通部分
     private const OPT = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         // MySQLからのエラーを取得する
@@ -31,6 +31,7 @@ class DB{
         // マルチクエリを不可に。セキュリティ的な目的。
         PDO::MYSQL_ATTR_MULTI_STATEMENTS => false,
     ];
+    
     private function __construct(){
         // データベースに接続する。
         $this->dbh = new PDO(self::DB, self::USER, self::PASSWORD, self::OPT);  

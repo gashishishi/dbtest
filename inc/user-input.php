@@ -1,7 +1,9 @@
 <?php
 /**
  * ユーザー入力のバリデーションチェック、データチェックを行い、
- * xss対策の関数を含むクラス
+ * xss対策の関数を含むクラス。
+ * 配下のメソッドではgetNoNameError(),getNoPasswordError()を除き
+ * エラーメッセージをstringまたはarrayで返す。
  */
 class UserInput{
     /** エラーメッセージ */
@@ -104,7 +106,7 @@ class UserInput{
 
 
     /**
-     * 指定idの行が存在するか調べる
+     * booksテーブルの指定idの行が存在するか調べる
      *
      * @param [type] BooksクラスのgetBookDataById()の戻り値
      * @return string エラーがあれば文字列で返す
@@ -117,21 +119,18 @@ class UserInput{
     
     /** ログイン入力のバリデーション */
     /**
-     * 最初に行う簡易チェック
-     * 
-     * @param array $inputData $_POSTを受け取る
-     * @return エラーメッセージを配列で返す。エラーがなければ返さない
+     * ユーザー名未入力エラーの取得
+     * @return string USERNAME_ERROR['NoUsername']エラー
      */ 
-    static function checkNameSimple(string $inputName) {
-        if (empty($inputName)){
-            return self::USERNAME_ERROR['NoUsername'];
-        }
-        
+    static function getNoNameError(): string {
+        return self::USERNAME_ERROR['NoUsername'];       
     }
-    static function checkPasswordSimple(string $inputPassword) {
-        if (empty($inputPassword)){
-            return self::PASSWORD_ERROR['NoPassword'];
-        }
+    /**
+     * パスワード未入力エラーの取得
+     * @return string USERNAME_ERROR['NoPassword']エラー
+     */ 
+    static function getNoPasswordError(): string {
+        return self::PASSWORD_ERROR['NoPassword'];
     }
 
     /**
@@ -146,20 +145,5 @@ class UserInput{
             return self::PASSWORD_ERROR['WrongPassword'];
         }
     }
-
-    /**
-     * ユーザー名が存在するかのチェック
-     *
-     * @param [type] $stmtResult Usersクラスの$usernameを使い、DBから取得したパスワード
-     * @return boolean usernameがあればtrue
-     */ 
-    static function isUserName($stmtResult): bool {
-        // $resultが空ならusernameが存在しない
-        if (!$stmtResult){
-            return true;
-        }
-        return false;
-    }
-
 
 }

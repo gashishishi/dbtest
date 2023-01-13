@@ -13,36 +13,40 @@ class User{
     private $username;
     private $password;
 
-    public function __construct(array $userInput, bool $check = false){
+    /**
+     * @param array $userInput $_POST['username','password']を受け取る。
+     *                         usernameがDBにあるかのチェック時はnull
+     */
+    public function __construct(array $userInput = null){
         // データベース接続
         $this->dbh = DB::getDbInstance()->getDbh();
 
-        // ユーザー名とパスワードの未入力チェック。
-        $nameError = UserInput::checkNameSimple($userInput['username']);
-        $passwordError = UserInput::checkPasswordSimple($userInput['password']);
-        if($nameError){
-            echo $nameError;
-            return;
-        }
-        if($passwordError){
-            echo $passwordError;
-            return;
-        }
+        if($userInput){
+                // ユーザー名とパスワードの未入力チェック。
+            if(empty($userInput['username'])){
+                echo UserInput::getNoNameError();
+                return;
+            }
+            if(empty($userInput['password'])){
+                echo UserInput::getNoPasswordError();
+                return;
+            }
 
-        // エラーがなければ設定する
-        // ユーザー名の設定
-        $this->setUsername($userInput);
+            // エラーがなければ設定する
+            // ユーザー名の設定
+            $this->setUsername($userInput);
 
-        // ユーザー名が設定できたら、DBからハッシュ化されたパスワードを取得し設定する。
-        $this->setPassword();
-        
-        // パスワードのチェック
-        $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
-        if ($checkPasswordError){
-            echo $checkPasswordError;
-            return;
-        } else {
-            $this->createSessionId($userInput['password']);
+            // ユーザー名が設定できたら、DBからハッシュ化されたパスワードを取得し設定する。
+            $this->setPassword();
+            
+            // パスワードのチェック
+            $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
+            if ($checkPasswordError){
+                echo $checkPasswordError;
+                return;
+            } else {
+                $this->createSessionId($userInput['password']);
+            }
         }
 
     }
@@ -53,11 +57,12 @@ class User{
      * @param array $userInput ユーザー入力($_POST)
     */
     public function setUsername(array $userInput){
-        $usernameError = UserInput::isUsername($userInput);
-        if ($usernameError){
-            echo $usernameError;
-        } else{
+        $isUser = $this->isUsernameInDb($userInput['username']);
+        
+        if ($isUser){
             $this->username = UserInput::e($userInput['username']);
+        } else{
+            echo UserInput::getNoNameError();
         }
     }
 
@@ -69,24 +74,30 @@ class User{
         $stmt->bindParam(':username', $this->username, PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        // ユーザー名が存在するならパスワードを取得
-        $UsernameError = UserInput::isUsername($result);
 
-        if ($UsernameError){
-            echo $UsernameError;
-        } else {
+        // ユーザーが存在する($resultにDBから得たパスワードが入っている)なら
+        // パスワードをセット
+        if($result){
             $this->password = UserInput::e($result['password']);
         }
     }
 
-    public function isUsernameInDb($username){
+    /**
+     * ユーザー名がDBにあるか調べる。
+     *
+     * @param string $username 対象のユーザー名
+     * @return boolean 存在すればtrue
+     */
+    public function isUsernameInDb(string $username): bool {
         $sql = "SELECT count(*) as ct FROM users WHERE username = ?";
         $stmt = $this->dbh->prepare($sql);
         $stmt->bindParam(1, $username, PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result;
+        if ($result){
+            return true;
+        }
+        return false;
     }
 
     /** セッションidを再生成する。*/
