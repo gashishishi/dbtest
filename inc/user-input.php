@@ -134,7 +134,7 @@ class UserInput{
      * @param string $savedPass DB上のパスワード
      * @return string PASSWORD_ERROR['WrongPassword']エラー
      */ 
-    static function checkPassword($inputPass, $savedPass):string {
+    static function checkPassword($inputPass, $savedPass){
         if(!password_verify($inputPass, $savedPass)) { 
             return self::PASSWORD_ERROR['WrongPassword'];
         }

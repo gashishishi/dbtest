@@ -22,7 +22,7 @@ class User{
         // データベース接続
         $this->dbh = DB::getDbInstance()->getDbh();
 
-        if(isset($userInput)){
+        if(!empty($userInput)){
 
             // ユーザー名とパスワードの未入力チェック。
             if(empty($userInput['username'])){
@@ -39,7 +39,7 @@ class User{
                 $this->setUsername($userInput['username']);
 
                 // ユーザー名が設定できたら、DBからハッシュ化されたパスワードを取得し設定する。
-                $this->setPassword();
+                    $this->setPassword();
                 
                 // パスワードのチェック
                 $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
@@ -55,14 +55,14 @@ class User{
     /**
      * ユーザー入力からユーザー名を設定する。
      * 入力されたユーザー名にxxs対策を行う
-     * @param array $userInput ユーザー入力($_POST)
+     * @param string $username ユーザー入力($_POST['username'])
     */
-    public function setUsername(string $userInput){
-        $isUser = $this->isUsernameInDb($userInput['username']);
+    public function setUsername(string $username){
+        $isUser = $this->isUsernameInDb($username);
         if ($isUser){
-            echo UserInput::getNotExistUsernameError();
+            $this->username = UserInput::e($username);
         } else{
-            $this->username = UserInput::e($userInput['username']);
+            echo UserInput::getNotExistUsernameError();
         }
     }
 
