@@ -13,39 +13,43 @@ class User{
     private $username;
     private $password;
 
-    public function __construct(array $userInput, bool $check = false){
+    /**
+     * ユーザー名の存在チェック時は引数無し
+     *
+     * @param array|null $userInput
+     */
+    public function __construct(array $userInput = null){
         // データベース接続
         $this->dbh = DB::getDbInstance()->getDbh();
 
-        // ユーザー名とパスワードの未入力チェック。
-        $nameError = UserInput::checkNameSimple($userInput['username']);
-        $passwordError = UserInput::checkPasswordSimple($userInput['password']);
-        if($nameError){
-            echo $nameError;
-            return;
-        }
-        if($passwordError){
-            echo $passwordError;
-            return;
-        }
+        if(isset($userInput)){
 
-            // エラーがなければ設定する
-            // ユーザー名の設定
-            $this->setUsername($userInput);
-
-            // ユーザー名が設定できたら、DBからハッシュ化されたパスワードを取得し設定する。
-            $this->setPassword();
-            
-            // パスワードのチェック
-            $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
-            if ($checkPasswordError){
-                echo $checkPasswordError;
+            // ユーザー名とパスワードの未入力チェック。
+            if(empty($userInput['username'])){
+                echo UserInput::getNoNameError();
                 return;
-            } else {
-                $this->createSessionId($userInput['password']);
             }
-        }
+            if(empty($userInput['password'])){
+                echo UserInput::getNoPasswordError();
+                return;
+            }
 
+                // エラーがなければ設定する
+                // ユーザー名の設定
+                $this->setUsername($userInput['username']);
+
+                // ユーザー名が設定できたら、DBからハッシュ化されたパスワードを取得し設定する。
+                $this->setPassword();
+                
+                // パスワードのチェック
+                $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
+                if ($checkPasswordError){
+                    echo $checkPasswordError;
+                    return;
+                } else {
+                    $this->createSessionId($userInput['password']);
+                }
+        }
     }
 
     /**
@@ -53,14 +57,12 @@ class User{
      * 入力されたユーザー名にxxs対策を行う
      * @param array $userInput ユーザー入力($_POST)
     */
-    public function setUsername(array $userInput){
-        $usernameError = UserInput::isUsername($userInput);
-        if ($usernameError){
-            echo $usernameError;
+    public function setUsername(string $userInput){
+        $isUser = $this->isUsernameInDb($userInput['username']);
+        if ($isUser){
+            echo UserInput::getNotExistUsernameError();
         } else{
             $this->username = UserInput::e($userInput['username']);
-        } else{
-            echo UserInput::getNoNameError();
         }
     }
 
@@ -92,7 +94,10 @@ class User{
         $stmt->bindParam(1, $username, PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result;
+        if($result){
+            return true;
+        }
+        return false;
     }
 
     /** セッションidを再生成する。*/

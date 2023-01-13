@@ -30,15 +30,18 @@ class Books{
      * 本の情報の「更新」の場合にsetProperty()から呼び出される。
      * 
      * @param string $_POST['id']を受け取る
-     * @return array DBから取得した本の情報
+     * @return string|array 指定idが存在しなければUseInputクラスからのエラーを、存在すれば結果を配列で返す
      */
-    public function getBookDataById(string $bookId): array{
+    public function getBookDataById(string $bookId): array|string {
         $sql = 'SELECT id, title, isbn, price, publish, author FROM books WHERE id = :id';
         $stmt = $this->dbh->prepare($sql);
         $stmt->bindParam(":id", $bookId, PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        if (empty($result)){
+            return UserInput::getBookDataError();
+        }
         return $result;
     }
 
@@ -67,15 +70,12 @@ class Books{
         // $dataがidのみの場合(更新フォーム用)は、DBから本の情報を取得する
         if(count($data) === 1){
             $bookdata = $this->getBookDataById($data['id']);
-            $bdError = UserInput::isBookData($bookdata);
-            if ($bdError){
-                echo $bdError;
-                $error = true;
-            } else {
+            // 指定idがあれば配列で返ってくる
+            if (is_array($bookdata)){
                 $this->setProperty($bookdata);
+            } else{
+                echo $bookdata;
             }
-            // idのみの場合はここで終了する
-            return;
         }
 
         // 各値のバリデーションを行う。

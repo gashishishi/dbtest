@@ -104,83 +104,40 @@ class UserInput{
         return $error;
     }
 
-
-    /**
-     * booksテーブルの指定idの行が存在するか調べる
-     *
-     * @param [type] BooksクラスのgetBookDataById()の戻り値
-     * @return string エラーがあれば文字列で返す
-     */ 
-    static function isBookData($bookData){
-        if (empty($bookData)){
-            return self::BOOKDATA_ERROR;
-        }
+    static function getBookDataError():string{
+        return self::BOOKDATA_ERROR;
     }
-    
     /** ログイン入力のバリデーション */
     /**
-<<<<<<< HEAD
-     * 最初に行う簡易チェック
-     * 
-     * @param array $inputData $_POSTを受け取る
-     * @return エラーメッセージを文字列で返す。エラーがなければ返さない
-=======
      * ユーザー名未入力エラーの取得
      * @return string USERNAME_ERROR['NoUsername']エラー
->>>>>>> local
      */ 
     static function getNoNameError(): string {
         return self::USERNAME_ERROR['NoUsername'];       
     }
+
+    static function getNotExistUsernameError(): string {
+        return self::USERNAME_ERROR['NotExistUsername'];
+    }
     /**
-<<<<<<< HEAD
-     * 最初に行う簡易チェック
-     * 
-     * @param array $inputData $_POSTを受け取る
-     * @return エラーを文字列で返す。エラーがなければ返さない
-     */ 
-    static function checkPasswordSimple(string $inputPassword) {
-        if (empty($inputPassword)){
-            return self::PASSWORD_ERROR['NoPassword'];
-        }
-=======
      * パスワード未入力エラーの取得
      * @return string USERNAME_ERROR['NoPassword']エラー
      */ 
     static function getNoPasswordError(): string {
         return self::PASSWORD_ERROR['NoPassword'];
->>>>>>> local
     }
 
     /**
      * 入力されたpasswordとDBのパスワードを比較する。
      *
-     * @param [type] $inputPass Usersクラスの$password(ユーザー入力パスワード)
-     * @param [type] $savedPass DB上のパスワード
-     * @return void
+     * @param string $inputPass Usersクラスの$password(ユーザー入力パスワード)
+     * @param string $savedPass DB上のパスワード
+     * @return string PASSWORD_ERROR['WrongPassword']エラー
      */ 
-    static function checkPassword($inputPass, $savedPass){
+    static function checkPassword($inputPass, $savedPass):string {
         if(!password_verify($inputPass, $savedPass)) { 
             return self::PASSWORD_ERROR['WrongPassword'];
         }
     }
 
-<<<<<<< HEAD
-    /**
-     * ユーザー名が存在するかのチェック
-     *
-     * @param [type] $stmtResult Usersクラスの$usernameを使い、DBから取得したパスワード
-     * @return boolean 
-     */ 
-    static function isUserName($stmtResult): bool {
-        // $resultが空ならusernameが存在しない
-        if (!$stmtResult){
-            return true;
-        }
-        return false;
-    }
-
-
-=======
->>>>>>> local
 }
