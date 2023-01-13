@@ -13,23 +13,21 @@ class User{
     private $username;
     private $password;
 
-    public function __construct(array $userInput = null, bool $check = false){
+    public function __construct(array $userInput, bool $check = false){
         // データベース接続
         $this->dbh = DB::getDbInstance()->getDbh();
 
-        // jQueryなどで既存usernameのチェックを行う場合はデータベース接続のみ。
-        if(!$check){
-            // ユーザー名とパスワードの未入力チェック。
-            $nameError = UserInput::checkNameSimple($userInput['username']);
-            $passwordError = UserInput::checkPasswordSimple($userInput['password']);
-            if($nameError){
-                echo $nameError.'<br>';
-                return;
-            }
-            if($passwordError){
-                echo $passwordError.'<br>';
-                return;
-            }
+        // ユーザー名とパスワードの未入力チェック。
+        $nameError = UserInput::checkNameSimple($userInput['username']);
+        $passwordError = UserInput::checkPasswordSimple($userInput['password']);
+        if($nameError){
+            echo $nameError;
+            return;
+        }
+        if($passwordError){
+            echo $passwordError;
+            return;
+        }
 
             // エラーがなければ設定する
             // ユーザー名の設定
@@ -58,9 +56,11 @@ class User{
     public function setUsername(array $userInput){
         $usernameError = UserInput::isUsername($userInput);
         if ($usernameError){
-            echo "debug ここはsetUsername()";
+            echo $usernameError;
         } else{
             $this->username = UserInput::e($userInput['username']);
+        } else{
+            echo UserInput::getNoNameError();
         }
     }
 
@@ -72,27 +72,26 @@ class User{
         $stmt->bindParam(':username', $this->username, PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        // ユーザー名が存在するならパスワードを取得
-        $UsernameError = UserInput::isUsername($result);
 
-        if ($UsernameError){
-            echo $UsernameError;
-        } else {
+        // ユーザーが存在する($resultにDBから得たパスワードが入っている)なら
+        // パスワードをセット
+        if($result){
             $this->password = UserInput::e($result['password']);
         }
     }
 
-    public function isUsernameInDb($username){
+    /**
+     * ユーザー名がDBにあるか調べる。
+     *
+     * @param string $username 対象のユーザー名
+     * @return boolean 存在すればtrue
+     */
+    public function isUsernameInDb(string $username): bool {
         $sql = "SELECT count(*) as ct FROM users WHERE username = ?";
         $stmt = $this->dbh->prepare($sql);
         $stmt->bindParam(1, $username, PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        //bool値 で返すべき?
-        // isusername関数はuserinputにもあるからうまいこと統合したい
-
         return $result;
     }
 

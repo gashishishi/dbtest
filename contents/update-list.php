@@ -3,7 +3,6 @@ require_once __DIR__ .'/../inc/books.php';
 require_once __DIR__ .'/../inc/user-input.php';
 require_once __DIR__ .'/../inc/token-check.php';
 
-// var_dump($_POST);
 try {
     $books = new Books($_POST);
     $books->update();

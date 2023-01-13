@@ -1,12 +1,14 @@
 <?php
-session_start();
+if(!isset($_SESSION)){
+    session_start();
+}
 require_once __DIR__ .'/../inc/user.php';
 // if (!empty($_SESSION['login']))の下でuserクラスをインスタンス化すると、
-// createSessionId()でエラーになる。セッション開始前にheader.phpを読み込むのが原因
+// createSessionId()でエラーになる。セッション開始前にheader.phpを読み込むのが原因?
 try{
     $user = new User($_POST);
 } catch (PDOException $e){
-    echo "エラー!" .$user->e($e->getMessage());
+    echo "エラー!" .UserInput::e($e->getMessage());
 }
 include __DIR__ .'/../inc/header.php';
 if (!empty($_SESSION['login'])){

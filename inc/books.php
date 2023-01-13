@@ -47,7 +47,7 @@ class Books{
      * 引数は、「idのみ(更新フォームのvalueの設定)、idが無い(addBooks())、
      * 「少なくともidとタイトルを含む」(updateBooks()) の3パターン
      * 
-     * @param array $_POSTを受け取る
+     * @param array $_POSTや$_GETを受け取る
      * @return null エラーがある場合は途中で終了する。
      */
     public function setProperty(array $data) {
