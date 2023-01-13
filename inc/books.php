@@ -32,7 +32,7 @@ class Books{
      * @param string $_POST['id']を受け取る
      * @return string|array 指定idが存在しなければUseInputクラスからのエラーを、存在すれば結果を配列で返す
      */
-    public function getBookDataById(string $bookId): array|string {
+    public function getBookDataById(string $bookId){
         $sql = 'SELECT id, title, isbn, price, publish, author FROM books WHERE id = :id';
         $stmt = $this->dbh->prepare($sql);
         $stmt->bindParam(":id", $bookId, PDO::PARAM_INT);
