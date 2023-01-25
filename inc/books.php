@@ -140,6 +140,79 @@ EOD;
         echo "</table>";
     }
 
+    
+    public function createPager(){
+        $sql = 'SELECT count(*) as cnt FROM books'; //データ件数を数える
+        $page = $this->dbh->prepare($sql);
+        $page->execute();
+        $max = $page->fetch()['cnt'] ;
+        var_dump($max); // 
+    }
+
+    /**
+     * booksテーブルの検索結果を表示する。
+     *
+     * @param [type] $get $_GETを受け取る
+     * @return void 結果を<table>リストで表示する。
+     */
+    public function showSearch($get){
+        $param = [];
+        // xss対策
+        foreach($get as $key => $val){
+            $param[$key] = UserInput::e($val);
+        }
+
+        // sql文の組み立て
+        $sql = 'SELECT * FROM books WHERE 1 '; // 本を検索する。この文にANDをつなげていく。
+        foreach($param as $key => $val){
+            if(!empty($val)){
+                if($key === 'publish'){
+                    // 日付の場合、区切りを/で入れられたり、日付まで入れるので、年月でヒットするようにする。
+                    $sql .= "AND DATE_FORMAT(publish, '%Y-%m') = DATE_FORMAT('1980/12/21', '%Y-%m')";
+                    continue;
+                }
+                $sql .= "AND $key LIKE '%$val%' "; //指定した$keyの$valがあれば文を追加。
+            }
+        }
+        $sql .= empty($_GET['p']) ? " LIMIT 0,5" : " LIMIT $_GET[p],5";
+        var_dump($sql);
+
+        // DB接続
+        $statement = $this->dbh->prepare($sql);
+        $statement->execute();
+
+        // ↓sql文を実行
+        // 表構造のデータが戻ってくる。配列ではない
+        $statement = $this->dbh->query($sql);
+
+        // 検索結果をリスト形式で表示する。
+        echo "<table>";
+        echo "<tr><th>更新</th><th>書籍名</th><th>ISBN</th><th>価格</th><th>出版日</th><th>著者名</th></tr>";
+        foreach($statement as $row){
+            $id = UserInput::e($row[0]);
+            $title = UserInput::e($row[1]);
+            $isbn = UserInput::e($row[2]);
+            $price = UserInput::e($row[3]);
+            $publish = UserInput::e($row[4]);
+            $author = UserInput::e($row[5]);
+// ヒアドキュメント
+$booksList = <<<EOD
+<tr>
+<td><a href="input-form.php?id={$id}">更新</a></td>
+<td>$title</td>
+<td>$isbn</td>
+<td>$price</td>
+<td>$publish</td>
+<td>$author</td>
+</tr>
+EOD;
+            
+            echo $booksList;
+        }
+        echo "</table>";
+    }
+
+
    /** データベースにユーザー入力データを追加する */
    public function add() :void {
         $sql = 'INSERT INTO books(id, title, isbn, price, publish, author) 
