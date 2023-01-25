@@ -140,13 +140,19 @@ EOD;
         echo "</table>";
     }
 
-    
+
     public function createPager(){
+        //ページャー用の$_GET['p']が入ったことでおかしなことになったっぽい。
         $sql = 'SELECT count(*) as cnt FROM books'; //データ件数を数える
         $page = $this->dbh->prepare($sql);
         $page->execute();
         $max = $page->fetch()['cnt'] ;
-        var_dump($max); // 
+        var_dump($max);
+
+        $pagein = 5;
+        
+        for($i=0 ; $i <= $max; $i += $pagein)
+            echo "<a class='btn' href='./?p=$i'>" . $i/$pagein + 1 .'</a>';
     }
 
     /**
@@ -159,6 +165,9 @@ EOD;
         $param = [];
         // xss対策
         foreach($get as $key => $val){
+            if ($key === 'p'){
+                continue;
+            }
             $param[$key] = UserInput::e($val);
         }
 
@@ -168,7 +177,7 @@ EOD;
             if(!empty($val)){
                 if($key === 'publish'){
                     // 日付の場合、区切りを/で入れられたり、日付まで入れるので、年月でヒットするようにする。
-                    $sql .= "AND DATE_FORMAT(publish, '%Y-%m') = DATE_FORMAT('1980/12/21', '%Y-%m')";
+                    $sql .= "AND DATE_FORMAT(publish, '%Y-%m') = DATE_FORMAT('$get[publish]', '%Y-%m')";
                     continue;
                 }
                 $sql .= "AND $key LIKE '%$val%' "; //指定した$keyの$valがあれば文を追加。
@@ -186,6 +195,7 @@ EOD;
         $statement = $this->dbh->query($sql);
 
         // 検索結果をリスト形式で表示する。
+        // value値に検索文字列を入れて、検索文字列が消えないようにしたい。
         echo "<table>";
         echo "<tr><th>更新</th><th>書籍名</th><th>ISBN</th><th>価格</th><th>出版日</th><th>著者名</th></tr>";
         foreach($statement as $row){

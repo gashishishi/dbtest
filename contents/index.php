@@ -26,5 +26,6 @@ $books->createPager();
 </div>
 
 <?php !empty($_GET) ? $books->showSearch($_GET) : $books->showList(); ?>
+<?php $books->createPager(); ?>
     
 <?php include __DIR__ .'/../inc/footer.php';?>
