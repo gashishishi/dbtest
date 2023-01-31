@@ -1,0 +1,34 @@
+
+ID : <input type="text" id="id" />
+<button id="btn">SEND</button>
+
+<div id="res"> <!--ここに値が戻ってくる-->
+</div>
+
+  
+<script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+<script>
+
+$(function(){
+    // ボタンがクリックされたら
+    $("#btn").on("click", function(event){
+      // 入力されたID値を取得
+      var id = $("#id").val();
+      $.ajax({
+        type: "POST",
+        url: "show-json.php",//エラーがあればコンソールに帰ってくる。
+        data: { "id" : id },//送る値
+        dataType : "json"   //デコードする受け取るデータの型
+      }).done(function(data){
+        // data にはAPIからの戻り値が入ってくる
+        console.log(data);
+        $("#res").text(data.id +' : '+ data.title +' : '+ data.author);
+
+      }).fail(function(XMLHttpRequest, textStatus, error){
+        console.log(error);
+      });
+    });
+  });
+  </script>
+</body>
+</script>

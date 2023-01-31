@@ -20,6 +20,8 @@ class Books{
         $this->dbh = DB::getDbInstance()->getDbh();
 
         // もし引数があれば本の情報を設定する。
+        //いやこれいらなくないか?自由度下がるような。インスタンス化してから
+        //メソッド呼び出しで対応したほうがいいのでは。
         if (isset($userInput)){
             $this->setProperty($userInput);
         }
@@ -104,6 +106,28 @@ class Books{
             'author' => $this->author,
         ];
         return $property;
+    }
+
+    /**
+     * show-json.phpでjson形式のデータを表示する。
+     * または、ajax-json.htmlで指定idの本を表示する用。
+     *
+     * @param [type] $id booksテーブルのid
+     * @return void json形式でデータを表示。header()関数があるのでページ冒頭で起動する。
+     */
+    public function showJson($id){
+        $id = UserInput::e($id);
+        $sql = "SELECT * FROM books WHERE id = ?";
+        // ↓sql文を実行
+        // 表構造のデータが戻ってくる。配列ではない
+        $statement = $this->dbh->prepare($sql);
+        //バインドせずにexecuteに値を渡す場合、配列にする。
+        $statement ->execute([$id]);
+        // json形式で取得する。PHP初級の問題でheaderエンコードの話がある。後で別ページとして組み込む?json形式でダウンロードボタンつけたり?
+         //fetchAllのときは二次元配列、fetchのときは1次元配列で返ってくる。jqueryで取り出すとき注意。
+        $toJson = $statement->fetch(PDO::FETCH_ASSOC);
+        header('Content-type: application/json');
+        echo json_encode($toJson);
     }
 
     /** テーブル booksの内容を<table>で出力する */
