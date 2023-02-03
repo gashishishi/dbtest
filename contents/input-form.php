@@ -5,26 +5,28 @@ require_once __DIR__ .'/../inc/user.php';
 include __DIR__ .'/../inc/header.php';
 
 $token = User::createToken();
-
-// DBへの追加のフラグ。falseなら既存データの編集
-$addList = true;
-
-// $_GET['id']が無ければDBへのデータ追加
-// $_GET['id']があればデータの更新
+$edit = false;
+// DBの編集フラグ。trueで編集
+// $_GET['id']があればDBの更新
 if (!empty($_GET['id'])){
-    $addList = false;
-    
-    // DB接続のためBooksクラスをインスタンス化
-    $books = new Books();
-    
-    // inputタグのvalueに設定する用
-    // 本の情報の設定と取得
-    $books->setProperty($_GET);
-    $booksProperty = $books->getProperty();
-}
+    $edit = true;
 
+    // 更新の場合はvalueに値を設定するためbooksクラスをインスタンス化する。
+    try {
+        $books = new Books();
+
+        // inputタグのvalueを設定する。
+        $books->setId($_GET['id']);
+        $books->setEditProperty();
+        $booksProperty = $books->getProperty();
+
+    } catch(PDOException $e) {
+        echo $e;
+        exit();
+    }
+}
 ?>
-    <form action='<?= $addList ? 'add' : 'update' ?>-list.php' method='post'>
+    <form action='<?= $edit ? 'update' : 'add' ?>-list.php' method='post'>
         <p>
             <label for="title"> タイトル:</label>
             <input type="text" name="title" value="<?= $booksProperty['title'] ?? "" ?>">

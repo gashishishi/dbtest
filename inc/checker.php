@@ -5,13 +5,14 @@
  * 配下のメソッドではgetNoNameError(),getNoPasswordError()を除き
  * エラーメッセージをstringまたはarrayで返す。
  */
-class UserInput{
+class Checker{
     /** エラーメッセージ */
 
    /** booksテーブルに関するエラーメッセージ */
     private const ID_ERROR = [
         'NoId' => 'idを指定してください。',
         'IncorrectId' => 'idが正しくありません。',
+        'NotExistId' => '指定したデータはありません。'
     ];
 
     private const TITLE_ERROR = [
@@ -27,8 +28,6 @@ class UserInput{
         ];
 
     private const AUTHOR_ERROR = '著者名は80文字以内で入力してください。';
-
-    private const BOOKDATA_ERROR = '指定したデータはありません';
 
     /** ログイン入力についてのエラーメッセージ */
     private const USERNAME_ERROR =[
@@ -50,13 +49,21 @@ class UserInput{
     /** 
      * booksのidのバリデーション 
      * 
-     * @param string $_POST['id']を受け取る
+     * @param string|array booksテーブルのidを指定もしくは、
+     *                     booksテーブルに対する$stmt->fetch()
      * @return  エラーがあればエラーメッセージ文字列を返す
     */
-    static function checkId(string $id) {
-        if (empty($id)){
+    static function checkId(string|array $input) {
+        // 値が配列かつ空なら$stmt->fetch()に対するエラーメッセージを返す。
+        if (is_array($input)){
+            if (empty($input)){
+            return self::ID_ERROR['NotExistId'];
+            }
+        // 配列じゃないけど空の場合
+        } else if (empty($input)){
             return self::ID_ERROR['NoId'];
-        } else if (!preg_match('/\A\d{1,11}+\z/u', $id)) {
+        // idを正規表現で調べる
+        } else if (!preg_match('/\A\d{1,11}+\z/u', $input)) {
             return self::ID_ERROR['IncorrectId'];
         }
     }
@@ -104,9 +111,7 @@ class UserInput{
         return $error;
     }
 
-    static function getBookDataError():string{
-        return self::BOOKDATA_ERROR;
-    }
+
     /** ログイン入力のバリデーション */
     /**
      * ユーザー名未入力エラーの取得

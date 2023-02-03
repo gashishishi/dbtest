@@ -8,7 +8,7 @@ require_once __DIR__ .'/../inc/user.php';
 try{
     $user = new User($_POST);
 } catch (PDOException $e){
-    echo "エラー!" .UserInput::e($e->getMessage());
+    echo "エラー!" .Checker::e($e->getMessage());
 }
 include __DIR__ .'/../inc/header.php';
 if (!empty($_SESSION['login'])){

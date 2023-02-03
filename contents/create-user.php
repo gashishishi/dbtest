@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ .'/../inc/user-input.php';
+require_once __DIR__ .'/../inc/Checker.php';
 require_once __DIR__ .'/../inc/user.php';
 require_once __DIR__ .'/login-check.php';
 include __DIR__ .'/../inc/header.php';

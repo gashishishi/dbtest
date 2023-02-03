@@ -1,15 +1,15 @@
 <?php
 session_start();
 // データベースに接続する情報を読みこむ。
-require_once __DIR__ .'/../inc/user-input.php';
+require_once __DIR__ .'/../inc/Checker.php';
 require_once __DIR__ .'/../inc/user.php';
 require_once __DIR__ .'/login-check.php';
 try{
     $user = new User();
 } catch (PDOException $e){
-    echo "エラー!" .$user->e($e->getMessage());
+    echo "エラー!" . Checker::e($e->getMessage());
 }
-$existName = $user->isUsernameInDb($_POST['username']);
+$existName = $user->isExist($_POST['username']);
 if ($existName['ct'] == 0){
 
   // echo した文字列が戻り値になります

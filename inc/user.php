@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ .'/user-input.php';
+require_once __DIR__ .'/checker.php';
 require_once __DIR__ .'/db.php';
 
 /**
@@ -26,11 +26,11 @@ class User{
 
             // ユーザー名とパスワードの未入力チェック。
             if(empty($userInput['username'])){
-                echo UserInput::getNoNameError();
+                echo Checker::getNoNameError();
                 return;
             }
             if(empty($userInput['password'])){
-                echo UserInput::getNoPasswordError();
+                echo Checker::getNoPasswordError();
                 return;
             }
 
@@ -42,7 +42,7 @@ class User{
                     $this->setPassword();
                 
                 // パスワードのチェック
-                $checkPasswordError = UserInput::checkPassword($userInput['password'], $this->password);
+                $checkPasswordError = Checker::checkPassword($userInput['password'], $this->password);
                 if ($checkPasswordError){
                     echo $checkPasswordError;
                     return;
@@ -58,11 +58,11 @@ class User{
      * @param string $username ユーザー入力($_POST['username'])
     */
     public function setUsername(string $username){
-        $isUser = $this->isUsernameInDb($username);
+        $isUser = $this->isExist($username);
         if ($isUser){
-            $this->username = UserInput::e($username);
+            $this->username = Checker::e($username);
         } else{
-            echo UserInput::getNotExistUsernameError();
+            echo Checker::getNotExistUsernameError();
         }
     }
 
@@ -78,7 +78,7 @@ class User{
         // ユーザーが存在する($resultにDBから得たパスワードが入っている)なら
         // パスワードをセット
         if($result){
-            $this->password = UserInput::e($result['password']);
+            $this->password = Checker::e($result['password']);
         }
     }
 
@@ -88,7 +88,7 @@ class User{
      * @param string $username 対象のユーザー名
      * @return boolean 存在すればtrue
      */
-    public function isUsernameInDb(string $username): bool {
+    public function isExist(string $username): bool {
         $sql = "SELECT count(*) as ct FROM users WHERE username = ?";
         $stmt = $this->dbh->prepare($sql);
         $stmt->bindParam(1, $username, PDO::PARAM_STR);

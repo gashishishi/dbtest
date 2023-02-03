@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ .'/user-input.php';
+require_once __DIR__ .'/checker.php';
 require_once __DIR__ .'/db.php';
 
 /** データベースのbooksテーブルに関するクラス */
@@ -15,82 +15,87 @@ class Books{
     private $publish;
     private $author;
 
-    public function __construct(array $userInput = null){
+    /**
+     * インスタンス時にDBに接続する。
+     */
+    public function __construct(){
         // データベースに接続する
         $this->dbh = DB::getDbInstance()->getDbh();
-
-        // もし引数があれば本の情報を設定する。
-        //いやこれいらなくないか?自由度下がるような。インスタンス化してから
-        //メソッド呼び出しで対応したほうがいいのでは。
-        if (isset($userInput)){
-            $this->setProperty($userInput);
-        }
     }
 
     /**
-     * idから本の情報を取得する。
-     * 本の情報の「更新」の場合にsetProperty()から呼び出される。
-     * 
-     * @param string $_POST['id']を受け取る
-     * @return string|array 指定idが存在しなければUseInputクラスからのエラーを、存在すれば結果を配列で返す
+     * idプロパティを設定する。
+     *
+     * @param string $id booksテーブルのidを指定する。
+     * @return void エラーが有る場合、エラーメッセージを表示する。
      */
-    public function getBookDataById(string $bookId){
+    public function setId(string $id){
+        $id = Checker::e($id);
+
+        // idのバリデーション
+        $error = Checker::checkId($id);
+        if($error){
+            echo $error .'<br>';
+            return;
+        }
+        // idを設定
+        $this->id = $id;
+    }
+
+    /**
+     * idをもとにDBから本の情報を取得する。
+     * 
+     * @param string booksテーブルのidを指定する。
+     * @return null|array 指定idが存在しなければUseInputクラスからのエラーを、存在すれば結果を配列で返す
+     */
+    public function getDataById(){
+         // DBから本の情報を取得する
         $sql = 'SELECT id, title, isbn, price, publish, author FROM books WHERE id = :id';
         $stmt = $this->dbh->prepare($sql);
-        $stmt->bindParam(":id", $bookId, PDO::PARAM_INT);
+        $stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (empty($result)){
-            return UserInput::getBookDataError();
+        // もし$resultが空ならエラーメッセージを出力する。
+        $error = Checker::checkId($result);
+        if ($error){
+            echo $error;
+            return ;
         }
         return $result;
     }
 
     /**
-     * 本の情報に関するプロパティを設定する。
-     * 引数は、「idのみ(更新フォームのvalueの設定)、idが無い(addBooks())、
-     * 「少なくともidとタイトルを含む」(updateBooks()) の3パターン
+     * DBの更新用に初期値となるBooksクラスのプロパティを設定する。
      * 
-     * @param array $_POSTや$_GETを受け取る
      * @return null エラーがある場合は途中で終了する。
      */
-    public function setProperty(array $data) {
+    public function setEditProperty() {
+        $data = $this->getDataById();
+        foreach ($data as $key => $val){
+            $this->$key = Checker::e($val);
+        }
+    }
+
+    /**
+     * DBの変更(更新or追加)用にBooksクラスのプロパティを設定する。
+     *
+     * @param array $input
+     * @return void
+     */
+    public function setChangeProperty(array $input){
         $error = false;
-
-        // idがあれば、idのバリデーションを行う。
-        // (idはDBへの更新時は必須だが、追加時には無い)
-        if (!empty($data['id'])){
-            $idError = UserInput::checkId($data['id']);
-            if($idError){
-                echo $idError .'<br>';
-                $error = true;
-                return;
-            }
-        }
-
-        // $dataがidのみの場合(更新フォーム用)は、DBから本の情報を取得する
-        if(count($data) === 1){
-            $bookdata = $this->getBookDataById($data['id']);
-            // 指定idがあれば配列で返ってくる
-            if (is_array($bookdata)){
-                $this->setProperty($bookdata);
-            } else{
-                echo $bookdata;
-            }
-        }
-
         // 各値のバリデーションを行う。
-        $bookDataErrors = UserInput::checkBookData($data);
+        $bookDataErrors = Checker::checkBookData($input);
+        // エラーがあれば表示する。
         foreach($bookDataErrors as $bookDataError){
             echo $bookDataError.'<br>';
             $error = true;
         }
-
         // エラーがなければ、各プロパティに値を設定する
         if(!$error){
-            foreach ($data as $key => $val){
-                $this->$key = UserInput::e($val);
+            foreach ($input as $key => $val){
+                $this->$key = Checker::e($val);
             }
         }
     }
@@ -109,91 +114,26 @@ class Books{
     }
 
     /**
-     * show-json.phpでjson形式のデータを表示する。
-     * または、ajax-json.htmlで指定idの本を表示する用。
+     * リスト作成のため、booksテーブルのデータを取得。
      *
-     * @param [type] $id booksテーブルのid
-     * @return void json形式でデータを表示。header()関数があるのでページ冒頭で起動する。
+     * @return $statement DBから取得したデータを返す。
      */
-    public function showJson($id){
-        $id = UserInput::e($id);
-        $sql = "SELECT * FROM books WHERE id = ?";
-        // ↓sql文を実行
-        // 表構造のデータが戻ってくる。配列ではない
-        $statement = $this->dbh->prepare($sql);
-        //バインドせずにexecuteに値を渡す場合、配列にする。
-        $statement ->execute([$id]);
-        // json形式で取得する。PHP初級の問題でheaderエンコードの話がある。後で別ページとして組み込む?json形式でダウンロードボタンつけたり?
-         //fetchAllのときは二次元配列、fetchのときは1次元配列で返ってくる。jqueryで取り出すとき注意。
-        $toJson = $statement->fetch(PDO::FETCH_ASSOC);
-        header('Content-type: application/json');
-        echo json_encode($toJson);
-    }
-
-    /** テーブル booksの内容を<table>で出力する */
-    public function showList() :void {
+    public function list(){
         $sql = 'SELECT * FROM books';
         // ↓sql文を実行
         // 表構造のデータが戻ってくる。配列ではない
         $statement = $this->dbh->query($sql);
-
-        // booksテーブルの内容をリスト形式で表示する。
-        echo "<table>";
-        echo "<tr><th>更新</th><th>書籍名</th><th>ISBN</th><th>価格</th><th>出版日</th><th>著者名</th></tr>";
-        foreach($statement as $row){
-            $id = UserInput::e($row[0]);
-            $title = UserInput::e($row[1]);
-            $isbn = UserInput::e($row[2]);
-            $price = UserInput::e($row[3]);
-            $publish = UserInput::e($row[4]);
-            $author = UserInput::e($row[5]);
-// ヒアドキュメント
-$booksList = <<<EOD
-<tr>
-<td><a href="input-form.php?id={$id}">更新</a></td>
-<td>$title</td>
-<td>$isbn</td>
-<td>$price</td>
-<td>$publish</td>
-<td>$author</td>
-</tr>
-EOD;
-            
-            echo $booksList;
-        }
-        echo "</table>";
+        return $statement;
     }
-
-
-    public function createPager(){
-        //ページャー用の$_GET['p']が入ったことでおかしなことになったっぽい。
-        $sql = 'SELECT count(*) as cnt FROM books'; //データ件数を数える
-        $page = $this->dbh->prepare($sql);
-        $page->execute();
-        $max = $page->fetch()['cnt'] ;
-        var_dump($max);
-
-        $pagein = 5;
-        
-        for($i=0 ; $i <= $max; $i += $pagein)
-            echo "<a class='btn' href='./?p=$i'>" . $i/$pagein + 1 .'</a>';
-    }
-
+ 
     /**
-     * booksテーブルの検索結果を表示する。
+     * DBから取得したbooksテーブルの検索結果を返す。
      *
-     * @param [type] $get $_GETを受け取る
-     * @return void 結果を<table>リストで表示する。
+     * @param array $get $_GETを受け取る
+     * @return 
      */
-    public function showSearch($get){
-        $param = [];
-        // xss対策
-        foreach($get as $key => $val){
-            if ($key === 'p'){
-                continue;
-            }
-            $param[$key] = UserInput::e($val);
-        }
+    public function search(array $get){
+        $param = $this->removePagerKey($get);
 
         // sql文の組み立て
         $sql = 'SELECT * FROM books WHERE 1 '; // 本を検索する。この文にANDをつなげていく。
@@ -208,42 +148,71 @@ EOD;
             }
         }
         $sql .= empty($_GET['p']) ? " LIMIT 0,5" : " LIMIT $_GET[p],5";
-        var_dump($sql);
+        // var_dump($sql);
 
-        // DB接続
+        // ↓sql文を実行
         $statement = $this->dbh->prepare($sql);
         $statement->execute();
 
+        return $statement;
+    }
+
+    /**
+     * ページャー用の'p'キーを除去し、ついでにxss対策を行う
+     *
+     * @param array $input ユーザー入力データ
+     * @return array pキーを除いた$input。
+     */
+    public function removePagerKey(array $input): array{
+        $param = [];
+        foreach($input as $key => $val){
+            if ($key === 'p'){
+                continue;
+            }        
+            // xss対策
+            $param[$key] = Checker::e($val);
+        }
+        return $param;
+    }
+
+    /**
+     * ページャーを出力する。
+     *
+     * @return void
+     */
+    public function pager(){
+        $sql = 'SELECT count(*) as cnt FROM books'; //データ件数を数える
+        $page = $this->dbh->prepare($sql);
+        $page->execute();
+        $max = $page->fetch()['cnt'] ;
+
+        $pagein = 5;
+        
+        for($i=0 ; $i <= $max; $i += $pagein)
+            echo "<a class='btn' href='./?p=$i'>" . $i/$pagein + 1 .'</a>';
+    }
+
+
+        /**
+     * show-json.phpでjson形式のデータを表示する。
+     * または、ajax-json.htmlで指定idの本を表示する用。
+     *
+     * @param [type] $id booksテーブルのid
+     * @return void json形式でデータを表示。header()関数があるのでページ冒頭で起動する。
+     */
+    public function showJson($id){
+        $id = Checker::e($id);
+        $sql = "SELECT * FROM books WHERE id = ?";
         // ↓sql文を実行
         // 表構造のデータが戻ってくる。配列ではない
-        $statement = $this->dbh->query($sql);
-
-        // 検索結果をリスト形式で表示する。
-        // value値に検索文字列を入れて、検索文字列が消えないようにしたい。
-        echo "<table>";
-        echo "<tr><th>更新</th><th>書籍名</th><th>ISBN</th><th>価格</th><th>出版日</th><th>著者名</th></tr>";
-        foreach($statement as $row){
-            $id = UserInput::e($row[0]);
-            $title = UserInput::e($row[1]);
-            $isbn = UserInput::e($row[2]);
-            $price = UserInput::e($row[3]);
-            $publish = UserInput::e($row[4]);
-            $author = UserInput::e($row[5]);
-// ヒアドキュメント
-$booksList = <<<EOD
-<tr>
-<td><a href="input-form.php?id={$id}">更新</a></td>
-<td>$title</td>
-<td>$isbn</td>
-<td>$price</td>
-<td>$publish</td>
-<td>$author</td>
-</tr>
-EOD;
-            
-            echo $booksList;
-        }
-        echo "</table>";
+        $statement = $this->dbh->prepare($sql);
+        //バインドせずにexecuteに値を渡す場合、配列にする。
+        $statement ->execute([$id]);
+        // json形式で取得する。PHP初級の問題でheaderエンコードの話がある。後で別ページとして組み込む?json形式でダウンロードボタンつけたり?
+         //fetchAllのときは二次元配列、fetchのときは1次元配列で返ってくる。jqueryで取り出すとき注意。
+        $toJson = $statement->fetch(PDO::FETCH_ASSOC);
+        header('Content-type: application/json');
+        echo json_encode($toJson);
     }
 
 

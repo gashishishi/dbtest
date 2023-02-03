@@ -3,7 +3,8 @@ require_once __DIR__ .'/../inc/books.php';
 require_once __DIR__ .'/../inc/token-check.php';
 
 try {
-    $books = new Books($_POST);
+    $books = new Books();
+    $books->setChangeProperty($_POST);
     $books->add();
     echo "追加しました<br>";
     echo "<a href='index.php'> リストへ戻る <a>";
