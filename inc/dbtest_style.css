@@ -16,6 +16,17 @@ h1 {
   float: left;
 }
 
+.text-overflow {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-card{
+  height: 200px;
+}
+
 form {
   /* フォームをページの中央に置く */
   margin: 0 auto;

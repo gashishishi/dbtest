@@ -14,6 +14,8 @@ try {
 }
 ?>
 <div class="container">
-    <?php $books->showList(); ?>
+    <div class="row justify-content-between">
+        <?php $books->showList(); ?>
+    </div>
 </div>
 <?php include __DIR__ .'/../inc/footer.php';?>
