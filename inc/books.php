@@ -114,8 +114,8 @@ class Books{
         $statement = $this->dbh->query($sql);
 
         // booksテーブルの内容をリスト形式で表示する。
-        echo "<table>";
-        echo "<tr><th>更新</th><th>書籍名</th><th>ISBN</th><th>価格</th><th>出版日</th><th>著者名</th></tr>";
+echo "<table>";
+echo "<tr><th>更新</th><th>書籍名</th><th>ISBN</th><th>価格</th><th>出版日</th><th>著者名</th></tr>";
         foreach($statement as $row){
             $id = UserInput::e($row[0]);
             $title = UserInput::e($row[1]);

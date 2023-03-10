@@ -13,7 +13,7 @@ try {
     exit;
 }
 ?>
-  
-<?php $books->showList(); ?>
-    
+<div class="container">
+    <?php $books->showList(); ?>
+</div>
 <?php include __DIR__ .'/../inc/footer.php';?>
